@@ -6,22 +6,32 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate": "drizzle-kit generate:sqlite",
+    "migrate": "drizzle-kit push:sqlite"
   },
   "dependencies": {
+    "@auth/drizzle-adapter": "^0.8.0",
+    "@libsql/client": "^0.5.6",
+    "drizzle-orm": "^0.30.4",
+    "iconoir-react": "^7.5.0",
+    "next": "14.1.4",
+    "next-auth": "^4.24.7",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.1.4"
+    "ua-parser-js": "^1.0.37"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/ua-parser-js": "^0.7.39",
     "autoprefixer": "^10.0.1",
+    "drizzle-kit": "^0.20.14",
+    "eslint": "^8",
+    "eslint-config-next": "14.1.4",
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
-    "eslint": "^8",
-    "eslint-config-next": "14.1.4"
+    "typescript": "^5"
   }
 }
