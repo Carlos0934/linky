@@ -13,7 +13,7 @@ export default function LinkForm() {
 
   const handleSubmit = async (data: FormData) => {
     formRef.current?.reset();
-    const shortUrl = await createLink(data);
+    const { shortUrl } = await createLink(data);
     if (autoPaste) copyToClipboard(shortUrl);
   };
 

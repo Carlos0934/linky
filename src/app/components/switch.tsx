@@ -4,7 +4,9 @@ type SwitchProps = {
   checked?: boolean;
   onChange?: (on: boolean) => void;
   label?: string;
+  defaultChecked?: boolean;
   className?: string;
+  name?: string;
 };
 
 export default function Switch({
@@ -12,6 +14,8 @@ export default function Switch({
   label,
   onChange,
   className,
+  name,
+  defaultChecked,
 }: SwitchProps) {
   return (
     <label
@@ -21,6 +25,8 @@ export default function Switch({
       <input
         type="checkbox"
         checked={checked}
+        defaultChecked={defaultChecked}
+        name={name}
         onChange={() => onChange?.(!checked)}
         className="sr-only peer"
       />

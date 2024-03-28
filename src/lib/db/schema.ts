@@ -7,6 +7,8 @@ import {
 } from "drizzle-orm/sqlite-core";
 import type { AdapterAccount } from "@auth/core/adapters";
 
+import { LINK_SHORT_PATH_LENGTH, LinkStatus } from "../domain/links";
+
 export const users = sqliteTable("user", {
   id: text("id").notNull().primaryKey(),
   name: text("name"),
@@ -59,14 +61,26 @@ export const verificationTokens = sqliteTable(
   })
 );
 
-export const links = sqliteTable("link", {
-  id: text("id").notNull().primaryKey(),
-  userId: text("userId").references(() => users.id, { onDelete: "cascade" }),
-  originalUrl: text("originalUrl").unique().notNull(),
-  shortPath: text("shortPath").unique().notNull(),
-  status: text("status").notNull(),
-  createdAt: integer("createdAt", { mode: "timestamp_ms" }).notNull(),
-});
+export const links = sqliteTable(
+  "link",
+  {
+    id: text("id").notNull().primaryKey(),
+    userId: text("userId").references(() => users.id, { onDelete: "cascade" }),
+    originalUrl: text("originalUrl").unique().notNull(),
+    shortPath: text("shortPath", {
+      length: LINK_SHORT_PATH_LENGTH,
+    })
+      .unique()
+      .notNull(),
+    status: text("status", {
+      enum: [LinkStatus.Active, LinkStatus.Inactive],
+    }).notNull(),
+    createdAt: integer("createdAt", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => ({
+    shortPathIndex: index("shortPathIndex").on(table.shortPath),
+  })
+);
 
 export const linkVisits = sqliteTable(
   "linkVisit",
@@ -91,7 +105,11 @@ export const linkVisits = sqliteTable(
   })
 );
 
-export enum LinkStatus {
-  ACTIVE = "active",
-  INACTIVE = "inactive",
-}
+export const schema = {
+  users,
+  accounts,
+  sessions,
+  verificationTokens,
+  links,
+  linkVisits,
+};

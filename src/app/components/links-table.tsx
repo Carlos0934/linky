@@ -1,8 +1,25 @@
 import { Link } from "@/lib/domain/links";
-import { getLatestLinks } from "../queries";
+import { getLatestLinks, getLinksByUserId } from "../queries";
 import LinksTableClient from "./links-table-client";
+import { getUser } from "@/lib/utils/get-user";
 
-export default async function LinksTable() {
-  const data: Link[] = await getLatestLinks();
-  return <LinksTableClient data={data} />;
+type LinksTableProps = {
+  showActions?: boolean;
+  latest?: boolean;
+};
+
+export default async function LinksTable({
+  showActions,
+  latest,
+}: LinksTableProps) {
+  const user = await getUser();
+
+  if (!user) {
+    return null;
+  }
+
+  const data = latest
+    ? await getLatestLinks(user.id)
+    : await getLinksByUserId(user.id);
+  return <LinksTableClient data={data} showActions={showActions} />;
 }

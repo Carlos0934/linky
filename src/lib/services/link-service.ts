@@ -1,105 +1,113 @@
-import { LibSQLDatabase } from "drizzle-orm/libsql";
-import generatePathShort from "../utils/generateShortPath";
-import { links, LinkStatus, linkVisits } from "../db/schema";
-import { count, desc, eq, inArray } from "drizzle-orm";
-import { Link, TrackVisitInput } from "../domain/links";
+import { ShortLink, USER_LINKS_LIMIT } from "../domain/links";
+import {
+  CreateLinkInput,
+  LinkRepository,
+  UpdateLinkInput,
+} from "../domain/link-repository";
+import { UAParser } from "ua-parser-js";
+import generateShortPath from "../utils/generate-short-path";
+import { LimitReachedError } from "../errors/limit-reached-error";
+import { UnauthorizedError } from "../errors/unauthorized-error";
 
+type TrackVisitInput = {
+  linkId: string;
+  request: Request;
+};
 export class LinkService {
-  private baseUrl: string;
-  constructor(private db: LibSQLDatabase) {
-    this.baseUrl = process.env.BASE_URL || "http://localhost:3000";
-  }
+  constructor(private linkRepository: LinkRepository) {}
 
-  async createLink(data: { url: string; id: string }) {
-    const link = {
-      id: data.id,
-      originalUrl: data.url,
-      shortPath: generatePathShort(6),
-      createdAt: new Date(),
-      status: LinkStatus.ACTIVE,
-    };
-    const result = await this.db.transaction(async (db) => {
-      while (true) {
-        const exists =
-          (
-            await db
-              .select()
-              .from(links)
-              .limit(1)
-              .where(eq(links.shortPath, link.shortPath))
-          ).length > 0;
+  async createLink(data: Omit<CreateLinkInput, "shortPath" | "status">) {
+    if (data.userId) {
+      const isLimitReached = await this.validateIsLimitReached(data.userId);
 
-        if (!exists) break;
-        link.shortPath = generatePathShort(6);
-      }
-
-      return db.insert(links).values(link).execute();
+      if (isLimitReached) throw new LimitReachedError(USER_LINKS_LIMIT);
+    }
+    const shortPath = generateShortPath();
+    const link = await this.linkRepository.createLink({
+      ...data,
+      status: "active",
+      shortPath,
     });
 
-    if (result.rowsAffected !== 1) throw new Error("Failed to create link");
-
-    return `${this.baseUrl}/${link.shortPath}`;
+    return link;
   }
 
-  async getLatestLinks(limit = 5) {
-    const rows = await this.db
-      .select({
-        id: links.id,
-        shortPath: links.shortPath,
-        originalUrl: links.originalUrl,
-        date: links.createdAt,
-        status: links.status,
-      })
-      .from(links)
-      .orderBy(desc(links.createdAt))
-      .limit(limit);
+  async updateLink({
+    id,
+    originalUrl,
+    status,
+    userId,
+  }: UpdateLinkInput & { userId: string }) {
+    const link = await this.linkRepository.getShortLinkById(id);
+    if (!link) return null;
 
-    if (rows.length === 0) return [];
+    if (link.userId !== userId) {
+      throw new UnauthorizedError();
+    }
 
-    const visits = await this.db
-      .select({
-        linkId: linkVisits.linkId,
-        count: count(linkVisits.linkId),
-      })
-      .from(linkVisits)
-      .where(
-        inArray(
-          linkVisits.linkId,
-          rows.map((r) => r.id)
-        )
-      )
-      .groupBy(linkVisits.linkId);
-
-    const visitsMap = visits.reduce((acc, v) => {
-      acc[v.linkId] = v.count;
-      return acc;
-    }, {} as Record<string, number>);
-
-    const result = rows.map<Link>(({ shortPath, ...data }) => ({
-      ...data,
-      shortUrl: `${this.baseUrl}/${shortPath}`,
-      clicks: visitsMap[data.id] || 0,
-    }));
-
-    return result;
+    return this.linkRepository.updateLink({ id, originalUrl, status });
   }
 
-  async getLinkByShortPath(shortPath: string) {
-    const rows = await this.db
-      .select()
-      .from(links)
-      .where(eq(links.shortPath, shortPath))
-      .limit(1);
-
-    if (rows.length === 0) return null;
-
-    return rows[0];
+  getLatestLinks(userId: string) {
+    const LAST_LINKS_LIMIT = 5;
+    return this.linkRepository.findLinksByUserId(userId, LAST_LINKS_LIMIT);
   }
 
-  async trackVisit({ ...data }: TrackVisitInput) {
-    await this.db
-      .insert(linkVisits)
-      .values({ ...data, createdAt: new Date() })
-      .execute();
+  async getByShortPath(shortPath: string) {
+    return this.linkRepository.getShortLinkByPath(shortPath);
+  }
+
+  async trackVisit({ linkId, request }: TrackVisitInput) {
+    const id = crypto.randomUUID();
+    const userAgent = request.headers.get("User-Agent");
+    const ip = request.headers.get("X-Forwarded-For");
+    const referrer = request.headers.get("Referer");
+    const country = request.headers.get("X-Vercel-IP-Country");
+    const city = request.headers.get("x-vercel-ip-city");
+
+    const ua = new UAParser(userAgent || undefined);
+
+    const userAgentData = {
+      os: ua.getOS().name,
+      engine: ua.getEngine().name,
+      device: `${ua.getDevice().model}`,
+      deviceType: ua.getDevice().type,
+      browser: ua.getBrowser().name,
+    };
+    const visit = await this.linkRepository.createVisit({
+      id,
+      linkId,
+      ip,
+      referer: referrer,
+      country,
+      city,
+      ...userAgentData,
+    });
+
+    return visit;
+  }
+
+  async getById(linkId: string): Promise<ShortLink | null> {
+    return this.linkRepository.getShortLinkById(linkId);
+  }
+
+  private async validateIsLimitReached(userId: string) {
+    const total = await this.linkRepository.countLinksByUserId(userId);
+
+    return total >= USER_LINKS_LIMIT;
+  }
+
+  async getLinksByUserId(userId: string) {
+    return this.linkRepository.findLinksByUserId(userId);
+  }
+
+  async deleteLink({ linkId, userId }: { linkId: string; userId: string }) {
+    const link = await this.linkRepository.getShortLinkById(linkId);
+    if (!link) return null;
+
+    if (link.userId !== userId) {
+      throw new UnauthorizedError();
+    }
+    return this.linkRepository.deleteLink(linkId);
   }
 }

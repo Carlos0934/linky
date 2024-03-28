@@ -8,11 +8,14 @@
     "start": "next start",
     "lint": "next lint",
     "generate": "drizzle-kit generate:sqlite",
-    "migrate": "drizzle-kit push:sqlite"
+    "migrate": "drizzle-kit push:sqlite",
+    "test": "vitest"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^0.8.0",
+    "@headlessui/react": "^1.7.18",
     "@libsql/client": "^0.5.6",
+    "classnames": "^2.5.1",
     "drizzle-orm": "^0.30.4",
     "iconoir-react": "^7.5.0",
     "next": "14.1.4",
@@ -22,16 +25,21 @@
     "ua-parser-js": "^1.0.37"
   },
   "devDependencies": {
+    "@testing-library/react": "^14.2.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/ua-parser-js": "^0.7.39",
+    "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.0.1",
+    "dotenv": "^16.4.5",
     "drizzle-kit": "^0.20.14",
     "eslint": "^8",
     "eslint-config-next": "14.1.4",
+    "jsdom": "^24.0.0",
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^1.4.0"
   }
 }

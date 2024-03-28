@@ -1,14 +1,33 @@
 "use client";
 
 import { Link } from "@/lib/domain/links";
-import { Link as LinkIcon, LinkSlash as LinkSlashIcon } from "iconoir-react";
+import {
+  Edit,
+  EditPencil,
+  Link as LinkIcon,
+  LinkSlash as LinkSlashIcon,
+  Trash,
+} from "iconoir-react";
 
 import LinkClipboard from "./link-clipboard";
+import { useRouter } from "next/navigation";
 
 type LinkTableProps = {
   data: Link[];
+  showActions?: boolean;
 };
-export default function LinksTableClient({ data }: LinkTableProps) {
+export default function LinksTableClient({
+  data,
+  showActions,
+}: LinkTableProps) {
+  const router = useRouter();
+  const handleEdit = (link: Link) => {
+    router.push(`/dashboard/?editLink=${link.id}`);
+  };
+
+  const handleDelete = (link: Link) => {
+    router.push(`/dashboard/?deleteLink=${link.id}`);
+  };
   return (
     <div className="relative mt-10 bg-gray-900  ">
       <table className="table-auto w-full text-sm">
@@ -19,6 +38,7 @@ export default function LinksTableClient({ data }: LinkTableProps) {
             <th className="px-4">Clicks</th>
             <th className="px-8">Status</th>
             <th className="rounded-tr-lg px-5 text-center">Date</th>
+            {showActions && <th className="px-5 text-center">Actions</th>}
           </tr>
         </thead>
         <tbody className="mt-5 text-gray-300  text-left">
@@ -31,7 +51,7 @@ export default function LinksTableClient({ data }: LinkTableProps) {
           )}
           {data.map((item) => (
             <tr key={item.id}>
-              <td className="p-4 px-6 ">
+              <td className="p-4 px-6 text-nowrap ">
                 {item.shortUrl}
                 <LinkClipboard url={item.shortUrl} />
               </td>
@@ -57,13 +77,32 @@ export default function LinksTableClient({ data }: LinkTableProps) {
                   </span>
                 </span>
               </td>
-              <td className="px-5">
+              <td className="px-5 text-nowrap">
                 {new Date(item.date).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
                 })}
               </td>
+
+              {showActions && (
+                <td className=" text-center space-x-5">
+                  <button
+                    onClick={() => handleEdit(item)}
+                    title="Edit"
+                    className="text-blue-500 inline-block hover:text-blue-600"
+                  >
+                    <EditPencil className="h-6 w-6" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item)}
+                    title="Delete"
+                    className="text-red-500 inline-block hover:text-red-600"
+                  >
+                    <Trash className="h-6 w-6" />
+                  </button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

@@ -1,4 +1,3 @@
-import Switch from "./components/switch";
 import LinksTable from "./components/links-table";
 
 import LinkForm from "./components/link-form";
@@ -22,7 +21,7 @@ export default async function Home() {
         more, please register.{" "}
       </p>
 
-      <LinksTable />
+      <LinksTable latest />
     </main>
   );
 }
