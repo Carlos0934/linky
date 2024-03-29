@@ -10,6 +10,8 @@ import { LinkObjectFactory } from "../utils/factories/link-object-factory";
 import { LinkInputObjectFactory } from "../utils/factories/create-link-input-object-factory";
 import { LinkVisitObjectFactory } from "../utils/factories/link-visit-object-factory";
 import { RequestObjectFactory } from "../utils/factories/request-object-factory";
+import { NotFoundError } from "@/lib/errors/not-found-error";
+import { UnauthorizedError } from "@/lib/errors/unauthorized-error";
 
 describe("LinkService", () => {
   const mockLinkRepository: LinkRepository = {
@@ -207,6 +209,162 @@ describe("LinkService", () => {
       // Assert
 
       expect(result).toEqual(mockVisit);
+    });
+  });
+
+  describe("LinkService - deleteLink", async () => {
+    test("should delete the link", async () => {
+      // Arrange
+      const linkId = "abc123";
+      const userId = "user123";
+      const mockLink = LinkObjectFactory.createLink({ id: linkId, userId });
+      mockLinkRepository.getShortLinkById = vi
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve(mockLink));
+
+      vi.spyOn(mockLinkRepository, "deleteLink");
+
+      const linkService = new LinkService(mockLinkRepository);
+
+      // Act
+      await linkService.deleteLink({ linkId, userId });
+
+      // Assert
+      expect(mockLinkRepository.deleteLink).toHaveBeenCalledWith(linkId);
+      expect(mockLinkRepository.deleteLink).toHaveBeenCalledTimes(1);
+    });
+
+    test("should throw an error if the link does not exist", async () => {
+      // Arrange
+      const linkId = "abc123";
+      const userId = "user123";
+
+      mockLinkRepository.getShortLinkById = vi
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve(null));
+
+      const linkService = new LinkService(mockLinkRepository);
+
+      // Act
+      const error = await getError(() =>
+        linkService.deleteLink({ linkId, userId })
+      );
+
+      // Assert
+
+      expect(error).toBeInstanceOf(NotFoundError);
+    });
+
+    test("should throw an error if the user is not the owner of the link", async () => {
+      // Arrange
+      const linkId = "abc123";
+      const userId = "user123";
+      const mockLink = LinkObjectFactory.createLink({
+        id: linkId,
+        userId: "another",
+      });
+
+      mockLinkRepository.getShortLinkById = vi
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve(mockLink));
+
+      const linkService = new LinkService(mockLinkRepository);
+
+      // Act
+      const error = await getError(() =>
+        linkService.deleteLink({ linkId, userId })
+      );
+
+      // Assert
+
+      expect(error).toBeInstanceOf(UnauthorizedError);
+    });
+  });
+
+  describe("LinkService - updateLink", async () => {
+    test("should update the link", async () => {
+      // Arrange
+      const linkId = "abc123";
+      const userId = "user123";
+      const originalUrl = "https://example.com";
+      const status = "inactive";
+
+      const mockLink = LinkObjectFactory.createLink({
+        id: linkId,
+        userId,
+        originalUrl,
+        status: "active",
+      });
+
+      mockLinkRepository.getShortLinkById = vi
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve(mockLink));
+
+      vi.spyOn(mockLinkRepository, "updateLink");
+
+      const linkService = new LinkService(mockLinkRepository);
+
+      // Act
+      await linkService.updateLink({ id: linkId, originalUrl, status, userId });
+
+      // Assert
+      expect(mockLinkRepository.updateLink).toHaveBeenCalledWith({
+        id: linkId,
+        originalUrl,
+        status,
+      });
+      expect(mockLinkRepository.updateLink).toHaveBeenCalledTimes(1);
+    });
+
+    test("should throw an error if the link does not exist", async () => {
+      // Arrange
+      const linkId = "abc123";
+      const userId = "user123";
+      const originalUrl = "https://example.com";
+      const status = "inactive";
+
+      mockLinkRepository.getShortLinkById = vi
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve(null));
+
+      const linkService = new LinkService(mockLinkRepository);
+
+      // Act
+      const error = await getError(() =>
+        linkService.updateLink({ id: linkId, originalUrl, status, userId })
+      );
+
+      // Assert
+
+      expect(error).toBeInstanceOf(NotFoundError);
+    });
+
+    test("should throw an error if the user is not the owner of the link", async () => {
+      // Arrange
+      const linkId = "abc123";
+      const userId = "user123";
+      const originalUrl = "https://example.com";
+      const status = "inactive";
+
+      const mockLink = LinkObjectFactory.createLink({
+        id: linkId,
+        userId: "another",
+      });
+
+      mockLinkRepository.getShortLinkById = vi
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve(mockLink));
+
+      const linkService = new LinkService(mockLinkRepository);
+
+      // Act
+      const error = await getError(() =>
+        linkService.updateLink({ id: linkId, originalUrl, status, userId })
+      );
+
+      // Assert
+
+      expect(error).toBeInstanceOf(UnauthorizedError);
     });
   });
 });

@@ -8,6 +8,7 @@ import { UAParser } from "ua-parser-js";
 import generateShortPath from "../utils/generate-short-path";
 import { LimitReachedError } from "../errors/limit-reached-error";
 import { UnauthorizedError } from "../errors/unauthorized-error";
+import { NotFoundError } from "../errors/not-found-error";
 
 type TrackVisitInput = {
   linkId: string;
@@ -39,7 +40,7 @@ export class LinkService {
     userId,
   }: UpdateLinkInput & { userId: string }) {
     const link = await this.linkRepository.getShortLinkById(id);
-    if (!link) return null;
+    if (!link) throw new NotFoundError();
 
     if (link.userId !== userId) {
       throw new UnauthorizedError();
@@ -103,7 +104,7 @@ export class LinkService {
 
   async deleteLink({ linkId, userId }: { linkId: string; userId: string }) {
     const link = await this.linkRepository.getShortLinkById(linkId);
-    if (!link) return null;
+    if (!link) throw new NotFoundError();
 
     if (link.userId !== userId) {
       throw new UnauthorizedError();

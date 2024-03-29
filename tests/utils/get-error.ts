@@ -1,10 +1,12 @@
 class NoErrorThrownError extends Error {}
 
-const getError = async <TError>(call: () => unknown): Promise<TError> => {
+const getError = async <TError>(
+  call: () => unknown
+): Promise<TError | undefined> => {
   try {
     await call();
 
-    throw new NoErrorThrownError();
+    return undefined;
   } catch (error: unknown) {
     return error as TError;
   }
