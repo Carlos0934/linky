@@ -1,7 +1,7 @@
 import db from "@/lib/db";
 import { LinkDrizzleRepository } from "@/lib/repositories/link-repository";
 import { LinkService } from "@/lib/services/link-service";
-import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 import { resetDb } from "../utils/reset-db";
 import { createUser } from "../utils/create-user";
 import { RequestObjectFactory } from "../utils/factories/request-object-factory";

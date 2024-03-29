@@ -31,7 +31,7 @@ describe("LinkService", () => {
     vi.restoreAllMocks();
   });
 
-  describe("LinkService - createLink", async () => {
+  describe("LinkService - createLink", () => {
     test("should create a new link", async () => {
       // Arrange
 
@@ -91,7 +91,7 @@ describe("LinkService", () => {
     });
   });
 
-  describe("LinkService - getLatestLinks", async () => {
+  describe("LinkService - getLatestLinks", () => {
     test("should return the latest links", async () => {
       // Arrange
       const userId = "user123";
@@ -151,7 +151,7 @@ describe("LinkService", () => {
     });
   });
 
-  describe("LinkService - getByShortPath", async () => {
+  describe("LinkService - getByShortPath", () => {
     test("should return the link by short path", async () => {
       // Arrange
       const shortPath = "abc123";
@@ -171,7 +171,7 @@ describe("LinkService", () => {
     });
   });
 
-  describe("LinkService - trackVisit", async () => {
+  describe("LinkService - trackVisit", () => {
     test("should track the visit", async () => {
       // Arrange
       const linkId = "abc123";
@@ -212,7 +212,7 @@ describe("LinkService", () => {
     });
   });
 
-  describe("LinkService - deleteLink", async () => {
+  describe("LinkService - deleteLink", () => {
     test("should delete the link", async () => {
       // Arrange
       const linkId = "abc123";
@@ -281,7 +281,7 @@ describe("LinkService", () => {
     });
   });
 
-  describe("LinkService - updateLink", async () => {
+  describe("LinkService - updateLink", () => {
     test("should update the link", async () => {
       // Arrange
       const linkId = "abc123";
