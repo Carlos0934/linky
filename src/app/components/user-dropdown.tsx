@@ -2,6 +2,7 @@
 import { Menu, Transition } from "@headlessui/react";
 import { NavArrowDown } from "iconoir-react";
 import { User } from "next-auth";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { Fragment } from "react";
 
@@ -16,10 +17,6 @@ const options = [
   {
     name: "Profile",
     href: "/profile",
-  },
-  {
-    name: "Sign out",
-    href: "signout",
   },
 ];
 export default function UserDropdown({ user }: UserDropdownProps) {
@@ -69,6 +66,19 @@ export default function UserDropdown({ user }: UserDropdownProps) {
                   )}
                 </Menu.Item>
               ))}
+
+              <Menu.Item>
+                {({ active }) => (
+                  <button
+                    onClick={() => signOut()}
+                    className={`${
+                      active ? "bg-blue-500 " : "text-gray-200"
+                    } group hover:text-white flex w-full transition items-center rounded-md px-2 py-2 text-sm`}
+                  >
+                    Sign out
+                  </button>
+                )}
+              </Menu.Item>
             </div>
           </Menu.Items>
         </Transition>
