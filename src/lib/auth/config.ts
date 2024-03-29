@@ -8,7 +8,7 @@ import { eq } from "drizzle-orm";
 
 export const authOptions: AuthOptions = {
   adapter: DrizzleAdapter(db) as Adapter,
-  secret: process.env.AUTH_SECRET!,
+  secret: process.env.NEXTAUTH_SECRET!,
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_APP_CLIENT_ID!,

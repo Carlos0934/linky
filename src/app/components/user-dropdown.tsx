@@ -70,7 +70,7 @@ export default function UserDropdown({ user }: UserDropdownProps) {
               <Menu.Item>
                 {({ active }) => (
                   <button
-                    onClick={() => signOut()}
+                    onClick={() => signOut({ callbackUrl: "/" })}
                     className={`${
                       active ? "bg-blue-500 " : "text-gray-200"
                     } group hover:text-white flex w-full transition items-center rounded-md px-2 py-2 text-sm`}
