@@ -6,6 +6,10 @@ import { afterEach } from "node:test";
 import getError from "../utils/get-error";
 import { LimitReachedError } from "@/lib/errors/limit-reached-error";
 import { USER_LINKS_LIMIT } from "@/lib/domain/links";
+import { LinkObjectFactory } from "../utils/factories/link-object-factory";
+import { LinkInputObjectFactory } from "../utils/factories/create-link-input-object-factory";
+import { LinkVisitObjectFactory } from "../utils/factories/link-visit-object-factory";
+import { RequestObjectFactory } from "../utils/factories/request-object-factory";
 
 describe("LinkService", () => {
   const mockLinkRepository: LinkRepository = {
@@ -30,12 +34,7 @@ describe("LinkService", () => {
       // Arrange
 
       const linkService = new LinkService(mockLinkRepository);
-      const data = {
-        id: "abc123",
-        originalUrl: "https://example.com",
-        linkId: "abc123",
-        userId: "user123",
-      };
+      const data = LinkInputObjectFactory.createLinkInput();
 
       // Act
       const result = await linkService.createLink(data);
@@ -50,12 +49,7 @@ describe("LinkService", () => {
       // Arrange
 
       const linkService = new LinkService(mockLinkRepository);
-      const data = {
-        id: "abc123",
-        originalUrl: "https://example.com",
-        linkId: "abc123",
-        userId: "user123",
-      };
+      const data = LinkInputObjectFactory.createLinkInput();
 
       // Act
       const result = await linkService.createLink(data);
@@ -68,12 +62,7 @@ describe("LinkService", () => {
       // Arrange
 
       const linkService = new LinkService(mockLinkRepository);
-      const data = {
-        id: "abc123",
-        originalUrl: "https://example.com",
-        linkId: "abc123",
-        userId: "user123",
-      };
+      const data = LinkInputObjectFactory.createLinkInput();
 
       // Act
       const result = await linkService.createLink(data);
@@ -89,12 +78,7 @@ describe("LinkService", () => {
         .mockImplementationOnce(() => Promise.resolve(USER_LINKS_LIMIT));
 
       const linkService = new LinkService(mockLinkRepository);
-      const data = {
-        id: "abc123",
-        originalUrl: "https://example.com",
-        linkId: "abc123",
-        userId: "user123",
-      };
+      const data = LinkInputObjectFactory.createLinkInput();
 
       // Act
       const error = await getError(() => linkService.createLink(data));
@@ -109,15 +93,7 @@ describe("LinkService", () => {
     test("should return the latest links", async () => {
       // Arrange
       const userId = "user123";
-      const mockLinks = [
-        {
-          id: "abc123",
-          originalUrl: "https://example.com",
-          shortUrl: "abc123",
-          status: "active",
-          userId,
-        },
-      ];
+      const mockLinks = Array(5).fill(LinkObjectFactory.createLink({ userId }));
 
       mockLinkRepository.findLinksByUserId = vi
         .fn()
@@ -135,15 +111,9 @@ describe("LinkService", () => {
     test("should return the latest 5 links", async () => {
       // Arrange
       const userId = "user123";
-      const mockLinks = Array.from({ length: 10 }, (_, i) => ({
-        id: `abc${i}`,
-        originalUrl: `https://example.com/${i}`,
-        shortUrl: `abc${i}`,
-        status: "active",
-        userId,
-        clicks: 0,
-        date: new Date(),
-      }));
+      const mockLinks = Array(10).fill(
+        LinkObjectFactory.createLink({ userId })
+      );
 
       mockLinkRepository.findLinksByUserId = vi.fn((_userId, limit) =>
         Promise.resolve(mockLinks.slice(0, limit))
@@ -163,13 +133,7 @@ describe("LinkService", () => {
     test("should return the link by id", async () => {
       // Arrange
       const linkId = "abc123";
-      const mockLink = {
-        id: "abc123",
-        originalUrl: "https://example.com",
-        shortUrl: "abc123",
-        status: "active",
-        userId: "user123",
-      };
+      const mockLink = LinkObjectFactory.createLink({ id: linkId });
 
       mockLinkRepository.getShortLinkById = vi
         .fn()
@@ -189,13 +153,7 @@ describe("LinkService", () => {
     test("should return the link by short path", async () => {
       // Arrange
       const shortPath = "abc123";
-      const mockLink = {
-        id: "abc123",
-        originalUrl: "https://example.com",
-        shortUrl: "abc123",
-        status: "active",
-        userId: "user123",
-      };
+      const mockLink = LinkObjectFactory.createLink({ shortUrl: shortPath });
 
       mockLinkRepository.getShortLinkByPath = vi
         .fn()
@@ -215,31 +173,26 @@ describe("LinkService", () => {
     test("should track the visit", async () => {
       // Arrange
       const linkId = "abc123";
-      const request = new Request("https://example.com", {
-        headers: new Headers({
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-          "X-Forwarded-For": "::1",
-          Referer: "https://example.com",
-          "X-Vercel-IP-Country": "US",
-          "x-vercel-ip-city": "New York",
-        }),
-      });
+      const referer = "https://google.com";
+      const ip = "::1";
+      const request = RequestObjectFactory.createRequest(
+        "https://example.com",
+        {
+          method: "GET",
+          headers: {
+            "user-agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+            referer: "https://google.com",
+            "X-Forwarded-For": ip,
+          },
+        }
+      );
 
-      const mockVisit = {
-        id: "abc123",
+      const mockVisit = LinkVisitObjectFactory.createLinkVisit({
         linkId,
-        ip: "::1",
-        referer: "https://example.com",
-        country: "US",
-        city: "New York",
-        device: "Windows",
-        deviceType: "desktop",
-        engine: "WebKit",
-        os: "Windows",
-        browser: "Chrome",
-        createdAt: new Date(),
-      };
+        referer,
+        ip,
+      });
 
       mockLinkRepository.createVisit = vi
         .fn()

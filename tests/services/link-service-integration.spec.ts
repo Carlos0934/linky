@@ -4,6 +4,7 @@ import { LinkService } from "@/lib/services/link-service";
 import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import { resetDb } from "../utils/reset-db";
 import { createUser } from "../utils/create-user";
+import { RequestObjectFactory } from "../utils/factories/request-object-factory";
 
 describe("LinkService Integration", () => {
   let linkService: LinkService;
@@ -73,15 +74,15 @@ describe("LinkService Integration", () => {
 
     await linkService.createLink(data);
 
-    const request = new Request("https://example.com", {
-      headers: new Headers({
+    const request = RequestObjectFactory.createRequest("https://example.com", {
+      headers: {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
         "X-Forwarded-For": "::1",
         Referer: "https://example.com",
         "X-Vercel-IP-Country": "US",
         "x-vercel-ip-city": "New York",
-      }),
+      },
     });
 
     // Act
