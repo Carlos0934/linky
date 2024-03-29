@@ -115,4 +115,34 @@ describe("LinkService Integration", () => {
     expect(result).toBeDefined();
     expect(result?.originalUrl).toBe(data.originalUrl);
   });
+
+  test("should update link", async () => {
+    // Arrange
+    const data = {
+      id: "abc123",
+      originalUrl: "https://example.com",
+      linkId: "abc123",
+      userId: "user123",
+    };
+
+    await createUser({ id: "user123", email: "example@example.com" });
+
+    const link = await linkService.createLink(data);
+
+    const updateData = {
+      id: link.id,
+      originalUrl: "https://example.com",
+      status: "inactive" as const,
+      userId: "user123",
+    };
+
+    // Act
+
+    const result = await linkService.updateLink(updateData);
+
+    // Assert
+
+    expect(result).toBeDefined();
+    expect(result.status).toBe("inactive");
+  });
 });
