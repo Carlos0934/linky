@@ -10,5 +10,5 @@ export function middleware(request: NextRequest) {
   request.headers.set("x-pathname", pathname);
   request.headers.set("x-query", url.searchParams.toString());
 
-  return NextResponse.next();
+  return NextResponse.next({ request });
 }

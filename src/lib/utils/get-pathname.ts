@@ -5,7 +5,7 @@ function getPathname() {
   const pathname = headersList.get("x-pathname");
   if (!pathname) return null;
 
-  return pathname.split("/").pop();
+  return pathname;
 }
 
 export default getPathname;

@@ -1,9 +1,10 @@
 "use client";
 import classNames from "classnames";
-import { ClockRotateRight, Settings, StatsDownSquare } from "iconoir-react";
-import { headers } from "next/headers";
+import { ClockRotateRight, StatsDownSquare } from "iconoir-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
+import SignInButton from "../components/sign-in-button";
 
 const options = [
   {
@@ -19,6 +20,13 @@ const options = [
 ];
 export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const session = useSession();
+
+  if (session.status === "loading") return <div>Loading...</div>;
+
+  if (session.status === "unauthenticated") {
+    redirect("/");
+  }
 
   return (
     <main className="w-full mx-auto max-w-screen-xl px-2 py-16 sm:px-0">
