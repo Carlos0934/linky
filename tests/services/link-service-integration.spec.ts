@@ -138,11 +138,38 @@ describe("LinkService Integration", () => {
 
     // Act
 
-    const result = await linkService.updateLink(updateData);
-
+    await linkService.updateLink(updateData);
+    const result = await linkService.getById(link.id);
     // Assert
 
     expect(result).toBeDefined();
-    expect(result.status).toBe("inactive");
+    expect(result?.status).toBe("inactive");
+  });
+  test("should delete link", async () => {
+    // Arrange
+    const data = {
+      id: "abc123",
+      originalUrl: "https://example.com",
+      linkId: "abc123",
+      userId: "user123",
+    };
+
+    await createUser({ id: "user123", email: "example@example.com" });
+
+    const link = await linkService.createLink(data);
+
+    // Act
+
+    await linkService.deleteLink({ linkId: link.id, userId: "user123" });
+
+    // Assert
+
+    const result = await linkService.getById(link.id);
+
+    expect(result).toBeNull();
+
+    const links = await linkService.getLinksByUserId("user123");
+
+    expect(links.length).toBe(0);
   });
 });
