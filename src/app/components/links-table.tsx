@@ -21,5 +21,6 @@ export default async function LinksTable({
   const data = latest
     ? await getLatestLinks(user.id)
     : await getLinksByUserId(user.id);
+
   return <LinksTableClient data={data} showActions={showActions} />;
 }

@@ -28,9 +28,10 @@ export default function LinksTableClient({
   const handleDelete = (link: Link) => {
     router.push(`/dashboard/?deleteLink=${link.id}`);
   };
+
   return (
-    <div className="relative mt-10 bg-gray-900  ">
-      <table className="table-auto w-full text-sm">
+    <div className=" mt-10">
+      <table className=" bg-gray-900 table-auto  w-full overflow-x-scroll ">
         <thead className="bg-gray-800  text-gray-200">
           <tr className="   text-left  ">
             <th className="px-6 py-4  rounded-tl-lg">Shortened Link</th>
@@ -50,16 +51,17 @@ export default function LinksTableClient({
             </tr>
           )}
           {data.map((item) => (
-            <tr key={item.id}>
-              <td className="p-4 px-6 text-nowrap ">
+            <tr key={item.id} className="tr">
+              <td className="td">
                 {item.shortUrl}
+
                 <LinkClipboard url={item.shortUrl} />
               </td>
-              <td className="max-w-sm text-ellipsis overflow-hidden text-nowrap">
+              <td className="max-w-sm text-ellipsis  overflow-hidden td">
                 {item.originalUrl}
               </td>
-              <td className="text-center">{item.clicks}</td>
-              <td className="text-center">
+              <td className=" td text-center">{item.clicks}</td>
+              <td className="td md:text-center">
                 <span
                   className={`rounded-full flex items-center justify-center  font-medium  capitalize px-2 py-1 ${
                     item.status === "active"
@@ -77,7 +79,7 @@ export default function LinksTableClient({
                   </span>
                 </span>
               </td>
-              <td className="px-5 text-nowrap">
+              <td className="px-5 td text-nowrap">
                 {new Date(item.date).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",
@@ -86,7 +88,7 @@ export default function LinksTableClient({
               </td>
 
               {showActions && (
-                <td className=" text-center space-x-5">
+                <td className=" td  text-center space-x-5">
                   <button
                     onClick={() => handleEdit(item)}
                     title="Edit"

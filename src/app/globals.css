@@ -18,3 +18,8 @@
 .text-gradient {
   @apply  bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400  text-transparent bg-clip-text;
 }
+
+.td {
+  @apply p-4 text-nowrap text-nowrap ;
+}
+

@@ -4,7 +4,7 @@ import LinkForm from "./components/link-form";
 
 export default async function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center text-gray-200 mt-24 pb-10">
+    <main className="flex min-h-screen flex-col items-center text-gray-200 mt-24 pb-10 ">
       <h1 className="text-center text-balance font-bold mx-auto inline-block leading-relaxed text-6xl text-gradient">
         Shorten Your Loooong Links
       </h1>
