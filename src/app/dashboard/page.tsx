@@ -14,11 +14,6 @@ export default function HistoryPage() {
 
       <header className="text-gray-300 flex justify-between mt-8">
         <h2 className="text-md font-semibold">History</h2>
-
-        <button className="inline-flex items-center gap-2">
-          <Filter className="w-5 h-5 " />
-          Filter
-        </button>
       </header>
 
       <EditLinkModal />

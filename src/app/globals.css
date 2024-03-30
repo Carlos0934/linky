@@ -20,6 +20,6 @@
 }
 
 .td {
-  @apply p-4 text-nowrap text-nowrap ;
+  @apply px-2 py-4 text-nowrap text-nowrap ;
 }
 

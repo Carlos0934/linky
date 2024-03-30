@@ -1,6 +1,5 @@
-import LinksTable from "./components/links-table";
-
 import LinkForm from "./components/link-form";
+import SignInButton from "./components/sign-in-button";
 
 export default async function Home() {
   return (
@@ -15,13 +14,12 @@ export default async function Home() {
 
       <LinkForm />
 
-      <p className="mt-8 text-gray-300">
-        You can create up to{" "}
-        <span className="font-semibold text-blue-500">5</span> links. To create
-        more, please register.{" "}
+      <p className="mt-8 text-gray-300 text-balance text-center max-w-screen-sm">
+        You can also sign up for an account to keep track of your shortened
+        links and view detailed analytics.
       </p>
 
-      <LinksTable latest />
+      <SignInButton className="mt-6" />
     </main>
   );
 }

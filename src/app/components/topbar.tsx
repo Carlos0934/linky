@@ -8,7 +8,10 @@ export default async function TopBar() {
 
   return (
     <header className="px-2 py-4 bg flex max-w-screen-xl mx-auto bg-foreground ">
-      <Link href="/" className=" text-4xl font-sans   font-bold text-gradient">
+      <Link
+        href="/"
+        className=" text-4xl font-sans pb-2 font-bold text-gradient"
+      >
         Linky
       </Link>
 
