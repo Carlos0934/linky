@@ -16,6 +16,8 @@ export interface LinkRepository {
   getShortLinkByPath(shortPath: string): Promise<ShortLink | null>;
   findLinksByUserId(userId: string, limit?: number): Promise<Link[]>;
   countLinksByUserId(userId: string): Promise<number>;
+  findLinkVisitsByLinkId(linkId: string, limit?: number): Promise<LinkVisit[]>;
+  findLinkVisitsByUserId(userId: string, limit?: number): Promise<LinkVisit[]>;
 
   createLink(link: CreateLinkInput): Promise<ShortLink>;
   createVisit(visit: CreateLinkVisitInput): Promise<LinkVisit>;

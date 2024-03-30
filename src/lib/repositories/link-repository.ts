@@ -22,6 +22,49 @@ export class LinkDrizzleRepository implements LinkRepository {
   constructor(private db: typeof database) {
     this.baseUrl = process.env.BASE_URL || "http://localhost:3000";
   }
+  async findLinkVisitsByUserId(
+    userId: string,
+    limit?: number | undefined
+  ): Promise<LinkVisit[]> {
+    const query = this.db
+      .select({
+        id: linkVisits.id,
+        linkId: linkVisits.linkId,
+        ip: linkVisits.ip,
+        referer: linkVisits.referer,
+        country: linkVisits.country,
+        city: linkVisits.city,
+        device: linkVisits.device,
+        deviceType: linkVisits.deviceType,
+        engine: linkVisits.engine,
+        browser: linkVisits.browser,
+        os: linkVisits.os,
+        createdAt: linkVisits.createdAt,
+      })
+      .from(linkVisits)
+      .innerJoin(links, eq(links.id, linkVisits.linkId))
+      .where(eq(links.userId, userId))
+      .orderBy(desc(linkVisits.createdAt));
+
+    if (limit) {
+      query.limit(limit);
+    }
+
+    return query;
+  }
+
+  findLinkVisitsByLinkId(
+    linkId: string,
+    limit?: number | undefined
+  ): Promise<LinkVisit[]> {
+    const query = this.db.query.linkVisits.findMany({
+      where: eq(linkVisits.linkId, linkId),
+      orderBy: desc(linkVisits.createdAt),
+      limit,
+    });
+
+    return query;
+  }
   async countLinksByUserId(userId: string): Promise<number> {
     const result = await this.db
       .select({

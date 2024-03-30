@@ -25,6 +25,8 @@ describe("LinkService", () => {
     deleteLink: vi.fn(),
     getShortLinkById: vi.fn(),
     updateLink: vi.fn(),
+    findLinkVisitsByLinkId: vi.fn(),
+    findLinkVisitsByUserId: vi.fn(),
   };
 
   afterEach(() => {

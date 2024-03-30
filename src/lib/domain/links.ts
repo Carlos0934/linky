@@ -17,6 +17,7 @@ export type LinkVisit = {
   device?: string | null;
   deviceType?: string | null;
   engine?: string | null;
+  browser?: string | null;
   os?: string | null;
   createdAt: Date;
 };
