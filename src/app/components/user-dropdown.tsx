@@ -14,10 +14,6 @@ const options = [
     name: "Dashboard",
     href: "/dashboard",
   },
-  {
-    name: "Profile",
-    href: "/profile",
-  },
 ];
 export default function UserDropdown({ user }: UserDropdownProps) {
   return (
