@@ -12,7 +12,7 @@ export class LinkDataAnalyticsService {
     linkId,
   }: {
     userId?: string;
-    linkId?: string;
+    linkId?: string | null;
   }): Promise<LinkDataAnalytics> {
     const visits = linkId
       ? await this.linkRepository.findLinkVisitsByLinkId(linkId)
@@ -55,7 +55,7 @@ export class LinkDataAnalyticsService {
     }
 
     return {
-      linkId,
+      linkId: linkId || undefined,
       clicks: {
         total: visits.length,
         last24Hours: clicksByPeriod.get("last24Hours") || 0,
